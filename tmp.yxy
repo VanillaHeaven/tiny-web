@@ -1,0 +1,11 @@
+[TEST] parse succ
+[TEST] method: GET
+[TEST] scheme: 
+[TEST] host: 
+[TEST] uri: /index.html
+[TEST] proto: 
+[TEST] Accept: Accept: */*
+
+[TEST] User-Agent: User-Agent: curl/7.79.1
+[TEST] Host: Host: www.dshane.xyz
+
