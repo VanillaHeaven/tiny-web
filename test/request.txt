@@ -1,4 +1,4 @@
-GET /index.html HTTP/1.1
+GET http://www.dshane.xyz/index.html?a=1 HTTP/1.1
 Host: www.dshane.xyz
 User-Agent: curl/7.79.1
 Accept: */*

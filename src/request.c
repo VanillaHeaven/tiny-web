@@ -12,15 +12,15 @@
 #define PARSE_FAIL -1
 
 
-int request_parse(int conn_fd, request_t* r)
+int request_parse(int conn_fd, request_t *r)
 {
     int        cflags          = REG_EXTENDED | REG_ICASE;
-    size_t     sub_num_reqline = 5;
-    size_t     sub_num_header  = 2;
-    char*      pattern_reqline = "^([a-zA-Z]+) (https?://([^/]*))?(/[^ ]*) HTTP/(1.1|1.0)";
-    char*      pattern_header  = "^([^:]+): *(( |\\S)+)";
-    regmatch_t sub_exp_reqline[5];
-    regmatch_t sub_exp_header[2];
+    size_t     sub_num_reqline = 6;
+    size_t     sub_num_header  = 3;
+    char*      pattern_reqline = "^([a-zA-Z]+) (https?://([^/]*))?(/[^ ]*) (HTTP/(1.1|1.0))";
+    char*      pattern_header  = "^([^:]+): *([^\r\n]+)";
+    regmatch_t sub_exp_reqline[6];
+    regmatch_t sub_exp_header[3];
     regex_t    reg_reqline;
     regex_t    reg_header;
 
@@ -104,5 +104,6 @@ int request_parse(int conn_fd, request_t* r)
         // free member;
     }
 
+    printf("==== parse end ====\n");
     return code;
 }

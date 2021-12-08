@@ -122,6 +122,7 @@ ssize_t rio_readlineb(rio_t *rp, void *userbuf, size_t max_len)
 
     while (line_len <= max_len) {
         status = rio_read(rp, bufp, 1);
+    printf("==== %d %c ====\n", status, bufp);
 
         if (status == 0) {
             *bufp = 0;

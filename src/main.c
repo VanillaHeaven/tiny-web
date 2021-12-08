@@ -66,10 +66,13 @@ int get_listen_fd(int port) {
 
 void echo(int conn_fd) {
     printf("connected success, connect fd is %d.\n", conn_fd);
-    request_t rt;
-    int res = parse(conn_fd, rt);
-    if (res == -1) {
-        printf("parse fail.")
+    request_t r;
+    int res = request_parse(conn_fd, &r);
+    if (res == 0) {
+        printf("parse succ.");
+    }
+    else {
+        printf("parse fail.");
     }
     return;
 }

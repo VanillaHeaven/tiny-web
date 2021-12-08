@@ -1,5 +1,8 @@
 CC = gcc
 
+tiny_web: obj/request.o obj/rio.o
+	$(CC) -o tiny_web -Iinclude src/main.c obj/request.o obj/rio.o -g
+
 request_test: obj/request.o obj/rio.o
 	$(CC) -o request_test -Iinclude test/request_test.c obj/request.o obj/rio.o -g
 
