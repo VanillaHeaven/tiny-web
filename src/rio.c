@@ -65,13 +65,17 @@ ssize_t rio_writen(int fd, void *buf, size_t n)
 static ssize_t rio_read(rio_t *rp, void *buf, size_t n)
 {
     // 当缓冲区为空，读入 n 个字节的内容（这个能异步完成吗？）
-    if (rp->rio_remain <= 0) {
-        rp->rio_bufp = rp->rio_buf;
-        rp->rio_remain = rio_readn(rp->rio_fd, rp->rio_bufp, RIO_BUF_SIZE);
-        if (rp->rio_remain < 0)
-            return -1;
+    while (rp->rio_remain <= 0) {
+        rp->rio_remain = read(rp->rio_fd, rp->rio_buf, RIO_BUF_SIZE);
+        if (rp->rio_remain < 0) {
+            if (errno != EINTR)
+                return -1;
+        }
         else if (rp->rio_remain == 0)
             return 0;
+        else {
+            rp->rio_bufp = rp->rio_buf;
+        }
     }
 
     int n_read;
@@ -122,7 +126,6 @@ ssize_t rio_readlineb(rio_t *rp, void *userbuf, size_t max_len)
 
     while (line_len <= max_len) {
         status = rio_read(rp, bufp, 1);
-    printf("==== %d %c ====\n", status, bufp);
 
         if (status == 0) {
             *bufp = 0;
@@ -132,10 +135,12 @@ ssize_t rio_readlineb(rio_t *rp, void *userbuf, size_t max_len)
             return -1;
 
         line_len++;
-        if (*bufp++ == '\n') {
+        if (*bufp == '\n') {
+            bufp++;
             *bufp = 0;
             return line_len;
         }
+        bufp++;
     }
 
     return -1;

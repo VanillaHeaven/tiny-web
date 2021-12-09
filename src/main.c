@@ -9,13 +9,21 @@ void echo(int conn_fd);
 
 int main(int argc, char** argv) {
 
-    int port;
+    int port = 0;
     int listen_fd, conn_fd;
     int client_addr_len;
     struct sockaddr_storage client_addr;
 
     // 1. 监听一个端口
-    port = 3333;
+    char *ch = argv[1];
+
+    while (*ch != '\0') {
+        port = port * 10 + (*ch - 48);
+        ch++;
+    }
+
+    printf("[TINY_WEB] listening on: %d\n", port);
+
     listen_fd = get_listen_fd(port);
     if (listen_fd == -1) {
         printf("Error: fail to listen port %d\n", port);
@@ -69,7 +77,18 @@ void echo(int conn_fd) {
     request_t r;
     int res = request_parse(conn_fd, &r);
     if (res == 0) {
-        printf("parse succ.");
+        printf("[TEST] parse succ\n");
+        printf("[TEST] method: %s\n", r.method);
+        printf("[TEST] scheme: %s\n", r.scheme);
+        printf("[TEST] host: %s\n", r.host);
+        printf("[TEST] uri: %s\n", r.uri);
+        printf("[TEST] proto: %s\n", r.proto);
+        
+        header_node_t *h = r.headers_in;
+        while (h != NULL) {
+            printf("[TEST] %s: %s\n", h->key, h->data);
+            h = h->next;
+        }
     }
     else {
         printf("parse fail.");

@@ -23,3 +23,4 @@ clean:
 	rm -rf obj
 	rm -rf rio_test
 	rm -rf request_test
+	rm -rf tiny_web
