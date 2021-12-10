@@ -1,5 +1,4 @@
 #include <regex.h>
-#include <stdio.h>
 #include "rio.h"
 #include "request.h"
 
@@ -104,6 +103,5 @@ int request_parse(int conn_fd, request_t *r)
         // free member;
     }
 
-    printf("==== parse end ====\n");
     return code;
 }

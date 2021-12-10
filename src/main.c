@@ -7,7 +7,8 @@ int get_listen_fd(int port);
 void echo(int conn_fd);
 
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
     int port = 0;
     int listen_fd, conn_fd;
@@ -46,8 +47,8 @@ int main(int argc, char** argv) {
 }
 
 
-int get_listen_fd(int port) {
-
+int get_listen_fd(int port)
+{
     int fd;
     struct sockaddr_in sa;
 
@@ -72,25 +73,65 @@ int get_listen_fd(int port) {
 }
 
 
-void echo(int conn_fd) {
+int response_handler(int conn_fd, request_t *r)
+{
+    if (strcmp(r->uri, "/index.html") == 0) {
+        char buf[] = 
+        "HTTP/1.1 200 OK\r\n"
+        "Server: tiny_web/0.0.1\r\n"
+        "Date: Wed, 04 Apr 2018 02:39:19 GMT\r\n"
+        "Content-Type: text/html\r\n"
+        "Content-Length: 12\r\n"
+        "\r\n"
+        "hello world!";
+
+        rio_writen(conn_fd, buf, sizeof(buf));
+        return 0;
+    }
+
+    if (strcmp(r->uri, "/gettime") == 0) {
+        int pid = fork();
+        if (pid < 0) {
+            return -1;
+        } else if (pid == 0) {
+            
+            char buf[] = 
+            "HTTP/1.1 200 OK\r\n"
+            "Server: tiny_web/0.0.1\r\n"
+            "Date: Wed, 04 Apr 2018 02:39:19 GMT\r\n"
+            "Content-Type: text/html\r\n"
+            "Content-Length: 12\r\n"
+            "\r\n"
+            "exec!";
+            
+            rio_writen(conn_fd, buf, sizeof(buf));
+            exit(0);
+        } else {
+            int status;
+            if (waitpid(-1, &status, 0) > 0) {
+                if (WIFEXITED(status)) {
+                    printf("child process exit done.\n");
+                } else {
+                    printf("child process exit err.\n");
+                }
+            }
+        }
+        return 0;
+    }
+
+    return -1;
+}
+
+
+void echo(int conn_fd)
+{
     printf("connected success, connect fd is %d.\n", conn_fd);
     request_t r;
     int res = request_parse(conn_fd, &r);
     if (res == 0) {
-        printf("[TEST] parse succ\n");
-        printf("[TEST] method: %s\n", r.method);
-        printf("[TEST] scheme: %s\n", r.scheme);
-        printf("[TEST] host: %s\n", r.host);
-        printf("[TEST] uri: %s\n", r.uri);
-        printf("[TEST] proto: %s\n", r.proto);
-        
-        header_node_t *h = r.headers_in;
-        while (h != NULL) {
-            printf("[TEST] %s: %s\n", h->key, h->data);
-            h = h->next;
-        }
-    }
-    else {
+        response_handler(conn_fd, &r);
+        return;
+    } else {
         printf("parse fail.");
     }
     return;
